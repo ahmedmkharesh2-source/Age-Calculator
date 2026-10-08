@@ -1,0 +1,702 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Age Calculator — Modern UI</title>
+
+    <style>
+      /* ============================================================
+         واجهة عصرية — حاسبة العمر (باستخدام CSS فقط)
+         ============================================================
+         🔹 مظهر داكن
+         🔹 تصميم متجاوب مع أحجام الشاشات المختلفة
+         🔹 بطاقات أنيقة وحدود ناعمة
+      ============================================================ */
+
+      :root {
+        color-scheme: dark;
+
+        /* متغيرات CSS لتخزين ألوان التصميم وقيمه */
+        --bg: #0b1020; /* اللون الأساسي لخلفية الصفحة */
+        --card: rgba(255, 255, 255, 0.06); /* خلفية البطاقة الرئيسية */
+        --card-2: rgba(
+          255,
+          255,
+          255,
+          0.08
+        ); /* خلفية أكثر وضوحًا للعناصر الصغيرة */
+        --border: rgba(255, 255, 255, 0.12); /* لون الحدود الناعمة */
+        --text: #e9eefc; /* اللون الأساسي للنصوص */
+        --muted: rgba(233, 238, 252, 0.7); /* لون النصوص الثانوية */
+        --accent: #7aa2ff; /* اللون المميز للتصميم */
+        --good: #39d98a; /* لون النجاح */
+        --bad: #ff5c7a; /* لون الخطأ */
+
+        --radius: 18px; /* نصف قطر الزوايا لجميع العناصر */
+        --shadow: 0 18px 40px rgba(0, 0, 0, 0.45); /* الظل العام */
+      }
+
+      * {
+        box-sizing: border-box; /* تحسين طريقة حساب أبعاد العناصر */
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center; /* توسيط التطبيق أفقيًا وعموديًا */
+        padding: 24px;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial,
+          sans-serif;
+        background: radial-gradient(
+            1200px 800px at 20% 10%,
+            rgba(122, 162, 255, 0.18),
+            transparent 60%
+          ),
+          radial-gradient(
+            1000px 700px at 90% 20%,
+            rgba(57, 217, 138, 0.12),
+            transparent 60%
+          ),
+          var(--bg);
+        color: var(--text);
+      }
+
+      .app {
+        width: min(920px, 100%); /* يناسب الشاشات الكبيرة ويتقلص مع الشاشات الصغيرة */
+        display: grid;
+        gap: 16px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 18px 20px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--card);
+        box-shadow: var(--shadow);
+      }
+
+      .title {
+        display: grid;
+        gap: 4px;
+      }
+
+      .title h1 {
+        margin: 0;
+        font-size: 20px;
+        letter-spacing: 0.2px;
+      }
+
+      .title p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .chip {
+        border: 1px solid var(--border);
+        background: var(--card-2);
+        padding: 8px 10px;
+        border-radius: 999px; /* إنشاء شكل كبسولة مستديرة */
+        font-size: 12px;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      .grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: 1.1fr 0.9fr; /* البطاقة اليسرى أكبر من اليمنى */
+      }
+
+      /* عند الشاشات الصغيرة، توضع البطاقتان فوق بعضهما */
+      @media (max-width: 860px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--card);
+        box-shadow: var(--shadow);
+        overflow: hidden; /* الحفاظ على تناسق الحدود الداخلية */
+      }
+
+      .cardHead {
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .cardHead h2 {
+        margin: 0;
+        font-size: 15px;
+      }
+
+      .cardBody {
+        padding: 18px;
+        display: grid;
+        gap: 14px;
+      }
+
+      label {
+        display: grid;
+        gap: 8px;
+      }
+
+      .labelRow {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .labelRow span {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      input[type="date"] {
+        width: 100%;
+        padding: 12px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        outline: none;
+      }
+
+      /* تنسيق حقل التاريخ عند التركيز عليه لتحسين سهولة الاستخدام */
+      input[type="date"]:focus {
+        border-color: rgba(122, 162, 255, 0.6);
+        box-shadow: 0 0 0 3px rgba(122, 162, 255, 0.18);
+      }
+
+      .btnRow {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        cursor: pointer;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text);
+        padding: 11px 14px;
+        border-radius: 12px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+      }
+
+      button.primary {
+        border-color: rgba(122, 162, 255, 0.55);
+        background: rgba(122, 162, 255, 0.16);
+      }
+
+      button:hover {
+        filter: brightness(1.08);
+      }
+
+      .hint {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .msg {
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      /* تنسيق رسالة الخطأ */
+      .msg.bad {
+        border-color: rgba(255, 92, 122, 0.55);
+        background: rgba(255, 92, 122, 0.12);
+        color: rgba(255, 210, 219, 0.95);
+      }
+
+      /* تنسيق رسالة النجاح */
+      .msg.good {
+        border-color: rgba(57, 217, 138, 0.55);
+        background: rgba(57, 217, 138, 0.12);
+        color: rgba(209, 255, 234, 0.95);
+      }
+
+      .stats {
+        display: grid;
+        gap: 12px;
+      }
+
+      .statGrid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+
+      /* في الشاشات الصغيرة جدًا، تظهر الإحصائيات بشكل عمودي */
+      @media (max-width: 520px) {
+        .statGrid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .stat {
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 14px 14px;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .stat .k {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .stat .v {
+        margin-top: 6px;
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: 0.2px;
+      }
+
+      .smallLine {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .footerNote {
+        text-align: center;
+        color: var(--muted);
+        font-size: 12px;
+        padding: 6px 0 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app">
+      <!-- رأس التطبيق: العنوان وتاريخ اليوم -->
+      <header>
+        <div class="title">
+          <h1>📅 Age Calculator</h1>
+          <p>أدخل تاريخ ميلادك، ثم احسب عمرك بدقة.</p>
+        </div>
+
+        <!-- سيُحدَّث هذا العنصر بواسطة JavaScript عند تحميل الصفحة -->
+        <div class="chip" id="todayChip">Today: —</div>
+      </header>
+
+      <div class="grid">
+        <!-- البطاقة اليسرى: إدخال البيانات -->
+        <section class="card">
+          <div class="cardHead">
+            <h2>🧾 Inputs</h2>
+            <span class="chip">Modern UI • Vanilla JS</span>
+          </div>
+
+          <div class="cardBody">
+            <!-- حقل إدخال تاريخ الميلاد -->
+            <label>
+              <div class="labelRow">
+                <span>Birth Date</span>
+                <span>(Required)</span>
+              </div>
+
+              <input id="birthDate" type="date" />
+            </label>
+
+            <!-- أزرار تنفيذ العمليات -->
+            <div class="btnRow">
+              <button class="primary" id="btnCalc">Calculate Age</button>
+              <button id="btnToday">Use Today (Demo)</button>
+              <button id="btnClear">Clear</button>
+            </div>
+
+            <!-- منطقة عرض الرسائل: عادية أو خطأ أو نجاح -->
+            <div class="msg" id="msgBox">
+              تلميح: اختر تاريخ ميلادك واضغط على «Calculate Age».
+            </div>
+
+            <!-- إرشادات مفيدة للمتعلم -->
+            <div class="hint">
+              🔹 يعتمد الحساب على قواعد التقويم الفعلية، بما فيها اختلاف
+              عدد أيام الأشهر والسنوات الكبيسة.<br />
+              🔹 يعرض العد التنازلي لعيد الميلاد القادم عدد الأيام المتبقية.
+            </div>
+          </div>
+        </section>
+
+        <!-- البطاقة اليمنى: عرض النتائج -->
+        <section class="card">
+          <div class="cardHead">
+            <h2>📊 Results</h2>
+
+            <!-- مؤشر الحالة: انتظار أو جاهزية أو اكتمال الحساب -->
+            <span class="chip" id="statusChip">Waiting…</span>
+          </div>
+
+          <div class="cardBody stats">
+            <!-- مربعات عرض السنوات والأشهر والأيام -->
+            <div class="statGrid">
+              <div class="stat">
+                <div class="k">Years</div>
+                <div class="v" id="outYears">—</div>
+              </div>
+
+              <div class="stat">
+                <div class="k">Months</div>
+                <div class="v" id="outMonths">—</div>
+              </div>
+
+              <div class="stat">
+                <div class="k">Days</div>
+                <div class="v" id="outDays">—</div>
+              </div>
+            </div>
+
+            <!-- سطر يعرض موعد عيد الميلاد القادم -->
+            <div class="smallLine" id="nextBirthdayLine">Next birthday: —</div>
+
+            <!-- سطر يعرض معلومات إضافية -->
+            <div class="smallLine" id="extraLine">Extra info: —</div>
+          </div>
+        </section>
+      </div>
+
+      <div class="footerNote">
+        تم إنشاء التطبيق باستخدام HTML وCSS وJavaScript دون مكتبات خارجية ❤️
+      </div>
+    </div>
+
+    <script>
+      /* ============================================================
+         نظرة عامة على الكود — حاسبة العمر
+         ============================================================
+         🔹 الهدف: حساب العمر بدقة بالسنوات والأشهر والأيام
+         🔹 التخطيط: اليسار لإدخال البيانات، واليمين لعرض النتائج
+         🔹 الاستخدامات: التعلم، والنماذج، وصفحات الملفات الشخصية
+         🔹 الخصائص الأساسية: حساب وفق التقويم الفعلي، والتحقق من البيانات،
+           وحساب موعد عيد الميلاد القادم
+      ============================================================ */
+
+      /* ============================================================
+         1) الوصول إلى عناصر الصفحة (مراجع DOM)
+         ============================================================ */
+
+      // حقل إدخال تاريخ الميلاد
+      const birthDateInput = document.getElementById("birthDate");
+
+      // الأزرار
+      const btnCalc = document.getElementById("btnCalc");
+      const btnToday = document.getElementById("btnToday");
+      const btnClear = document.getElementById("btnClear");
+
+      // عناصر عرض الأرقام الناتجة
+      const outYears = document.getElementById("outYears");
+      const outMonths = document.getElementById("outMonths");
+      const outDays = document.getElementById("outDays");
+
+      // عناصر عرض النصوص الناتجة
+      const nextBirthdayLine = document.getElementById("nextBirthdayLine");
+      const extraLine = document.getElementById("extraLine");
+
+      // عناصر التاريخ والحالة في أعلى الصفحة
+      const todayChip = document.getElementById("todayChip");
+      const statusChip = document.getElementById("statusChip");
+
+      // مربع الرسائل: عادي أو نجاح أو خطأ
+      const msgBox = document.getElementById("msgBox");
+
+      /* ============================================================
+         2) الدوال المساعدة: دوال صغيرة قابلة لإعادة الاستخدام
+         ============================================================ */
+
+      /** 
+       * تنسيق التاريخ لعرضه داخل العنصر الصغير أعلى الصفحة.
+       * تستقبل كائن Date وتحوّله إلى نص مقروء، مثل:
+       * "Mon, Dec 22, 2025"
+       */
+      function formatDateForChip(date) {
+        return date.toLocaleDateString(undefined, {
+          weekday: "short",
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+        });
+      }
+
+      /**
+       * إزالة الوقت من التاريخ.
+       * نريد مقارنة التاريخ فقط دون التأثر بالساعات والدقائق.
+       * تُرجع الدالة كائن Date جديدًا، مع ضبط الوقت على منتصف الليل.
+       */
+      function stripTime(date) {
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      }
+
+      /**
+       * حساب عدد أيام الشهر.
+       * monthIndex هو فهرس الشهر؛ يناير = 0 وديسمبر = 11.
+       * الحيلة هنا أن:
+       * new Date(year, month + 1, 0)
+       * تُرجع آخر يوم من الشهر المطلوب.
+       */
+      function daysInMonth(year, monthIndex) {
+        return new Date(year, monthIndex + 1, 0).getDate();
+      }
+
+      /**
+       * عرض رسالة للمستخدم.
+       * type يمكن أن تكون:
+       * "good" للنجاح، أو "bad" للخطأ، أو "neutral" للرسالة العادية.
+       * تحدّث الدالة واجهة المستخدم وتطبّق اللون المناسب.
+       */
+      function showMessage(type, text) {
+        msgBox.classList.remove("good", "bad");
+
+        if (type === "good") msgBox.classList.add("good");
+        if (type === "bad") msgBox.classList.add("bad");
+
+        msgBox.textContent = text;
+      }
+
+      /**
+       * تغيير نص مؤشر الحالة الموجود في بطاقة النتائج.
+       */
+      function setStatus(text) {
+        statusChip.textContent = text;
+      }
+
+      /**
+       * إعادة نتائج الحساب إلى حالتها الأولية.
+       * تُمسح النتائج وتُستبدل بالقيم الافتراضية.
+       */
+      function resetOutputs() {
+        outYears.textContent = "—";
+        outMonths.textContent = "—";
+        outDays.textContent = "—";
+
+        nextBirthdayLine.textContent = "Next birthday: —";
+        extraLine.textContent = "Extra info: —";
+
+        setStatus("Waiting…");
+      }
+
+      /* ============================================================
+         3) عملية حساب العمر الأساسية
+         ============================================================ */
+
+      /**
+       * حساب العمر بدقة اعتمادًا على تاريخ الميلاد وتاريخ اليوم.
+       *
+       * تُرجع الدالة كائنًا يحتوي على:
+       * { years, months, days }
+       *
+       * لماذا لا نعتمد على الفرق بالمللي ثانية فقط؟
+       * 🔹 لأن الأشهر تختلف في عدد أيامها.
+       * 🔹 لأن السنوات الكبيسة تحتوي على يوم إضافي.
+       *
+       * طريقة الحساب:
+       * 🔹 مقارنة أجزاء السنة والشهر واليوم.
+       * 🔹 إذا كان عدد الأيام سالبًا، نستعير أيام الشهر السابق.
+       * 🔹 إذا كان عدد الأشهر سالبًا، نستعير سنة ونضيف 12 شهرًا.
+       */
+      function calculateExactAge(birthDate, today) {
+        let years = today.getFullYear() - birthDate.getFullYear();
+        let months = today.getMonth() - birthDate.getMonth();
+        let days = today.getDate() - birthDate.getDate();
+
+        // إذا كانت الأيام سالبة، نستعير أيامًا من الشهر السابق
+        if (days < 0) {
+          // فهرس الشهر السابق بالنسبة إلى تاريخ اليوم
+          const prevMonthIndex = (today.getMonth() - 1 + 12) % 12;
+
+          // إذا كان الشهر الحالي يناير، فالشهر السابق يقع في السنة الماضية
+          const prevMonthYear =
+            today.getMonth() === 0
+              ? today.getFullYear() - 1
+              : today.getFullYear();
+
+          // حساب عدد أيام الشهر السابق
+          const prevMonthDays = daysInMonth(prevMonthYear, prevMonthIndex);
+
+          // إضافة أيام الشهر السابق وتقليل عدد الأشهر بمقدار شهر واحد
+          days += prevMonthDays;
+          months -= 1;
+        }
+
+        // إذا كان عدد الأشهر سالبًا، نستعير سنة
+        if (months < 0) {
+          months += 12;
+          years -= 1;
+        }
+
+        return { years, months, days };
+      }
+
+      /**
+       * حساب عدد الأيام المتبقية حتى عيد الميلاد القادم.
+       *
+       * الخطوات:
+       * 🔹 إنشاء تاريخ عيد الميلاد في السنة الحالية.
+       * 🔹 إذا كان عيد الميلاد قد مرّ، ننتقل إلى السنة القادمة.
+       * 🔹 حساب الفرق بين التاريخين بالأيام الكاملة.
+       */
+      function daysUntilNextBirthday(birthDate, today) {
+        const thisYear = today.getFullYear();
+
+        // إنشاء تاريخ عيد الميلاد المحتمل في السنة الحالية
+        let next = new Date(
+          thisYear,
+          birthDate.getMonth(),
+          birthDate.getDate()
+        );
+
+        // إذا كان عيد الميلاد قد مرّ هذا العام، ننتقل إلى العام القادم
+        if (stripTime(next) < stripTime(today)) {
+          next = new Date(
+            thisYear + 1,
+            birthDate.getMonth(),
+            birthDate.getDate()
+          );
+        }
+
+        // تحويل الفرق بالمللي ثانية إلى أيام كاملة
+        const msPerDay = 1000 * 60 * 60 * 24;
+        const diffMs = stripTime(next) - stripTime(today);
+        const diffDays = Math.round(diffMs / msPerDay);
+
+        return { nextBirthdayDate: next, daysLeft: diffDays };
+      }
+
+      /* ============================================================
+         4) أحداث واجهة المستخدم (الأزرار)
+         ============================================================ */
+
+      // عرض تاريخ اليوم في العنصر الصغير الموجود أعلى الصفحة
+      const now = new Date();
+      todayChip.textContent = `Today: ${formatDateForChip(now)}`;
+
+      // زر حساب العمر
+      btnCalc.addEventListener("click", () => {
+        // الخطوة 1: قراءة قيمة حقل التاريخ كنص، مثل "2020-05-20"
+        const birthValue = birthDateInput.value;
+
+        // الخطوة 2: التحقق من أن المستخدم أدخل تاريخ الميلاد
+        if (!birthValue) {
+          showMessage("bad", "❌ يرجى اختيار تاريخ الميلاد أولًا.");
+          resetOutputs();
+          return;
+        }
+
+        // الخطوة 3: تحويل النص إلى تاريخ بطريقة آمنة لتجنب مشكلات المناطق الزمنية
+        const [y, m, d] = birthValue.split("-").map(Number);
+        const birthDate = new Date(y, m - 1, d);
+
+        // الخطوة 4: الحصول على تاريخ اليوم دون الوقت
+        const today = stripTime(new Date());
+
+        // الخطوة 5: التحقق من أن تاريخ الميلاد ليس في المستقبل
+        if (stripTime(birthDate) > today) {
+          showMessage("bad", "❌ لا يمكن أن يكون تاريخ الميلاد في المستقبل.");
+          resetOutputs();
+          return;
+        }
+
+        // الخطوة 6: التحقق من أن سنة الميلاد ليست أقدم من 1900
+        if (y < 1900) {
+          showMessage("bad", "❌ يرجى إدخال سنة صحيحة (1900 أو أحدث).");
+          resetOutputs();
+          return;
+        }
+
+        // حساب العمر بدقة بالسنوات والأشهر والأيام
+        const age = calculateExactAge(birthDate, today);
+
+        // تحديث واجهة المستخدم بالنتائج
+        outYears.textContent = age.years;
+        outMonths.textContent = age.months;
+        outDays.textContent = age.days;
+
+        // حساب الوقت المتبقي حتى عيد الميلاد القادم
+        const { nextBirthdayDate, daysLeft } = daysUntilNextBirthday(
+          birthDate,
+          today
+        );
+
+        nextBirthdayLine.textContent = `عيد الميلاد القادم: ${formatDateForChip(
+          nextBirthdayDate
+        )} (بعد ${daysLeft} يوم${daysLeft === 1 ? "" : "ًا"})`;
+
+        // حساب إجمالي الأيام التي عاشها المستخدم تقريبًا
+        const msPerDay = 1000 * 60 * 60 * 24;
+        const totalDays = Math.floor((today - stripTime(birthDate)) / msPerDay);
+
+        extraLine.textContent = `معلومات إضافية: عشت تقريبًا ${totalDays.toLocaleString()} يوم.`;
+
+        // عرض رسالة نجاح وتحديث مؤشر الحالة
+        showMessage("good", "✅ تم حساب العمر بنجاح.");
+        setStatus("تم الحساب ✅");
+      });
+
+      // زر استخدام تاريخ اليوم لأغراض التجربة
+      // يضبط تاريخ الميلاد على تاريخ اليوم، فتكون النتيجة صفرًا
+      btnToday.addEventListener("click", () => {
+        const t = new Date();
+
+        // تحويل تاريخ اليوم إلى الصيغة المطلوبة لحقل التاريخ: YYYY-MM-DD
+        const yyyy = t.getFullYear();
+        const mm = String(t.getMonth() + 1).padStart(2, "0");
+        const dd = String(t.getDate()).padStart(2, "0");
+
+        birthDateInput.value = `${yyyy}-${mm}-${dd}`;
+
+        showMessage(
+          "neutral",
+          "📌 تم ضبط تاريخ الميلاد على تاريخ اليوم للتجربة. اضغط الآن على زر حساب العمر."
+        );
+
+        setStatus("جاهز…");
+      });
+
+      // زر مسح البيانات والنتائج
+      btnClear.addEventListener("click", () => {
+        birthDateInput.value = "";
+
+        resetOutputs();
+
+        showMessage(
+          "neutral",
+          "تلميح: اختر تاريخ ميلادك واضغط على «Calculate Age»."
+        );
+      });
+
+      // تحسين تجربة المستخدم: عند تغيير التاريخ، تتغير الحالة إلى «جاهز»
+      birthDateInput.addEventListener("change", () => {
+        setStatus("جاهز…");
+
+        showMessage(
+          "neutral",
+          "📌 تم اختيار التاريخ. اضغط على زر حساب العمر."
+        );
+      });
+    </script>
+  </body>
+</html>
